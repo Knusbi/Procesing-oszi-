@@ -1,0 +1,66 @@
+#define LEN 1000
+
+int fs[LEN + 10];             //function signal
+int i = LEN;
+int j = LEN;
+
+
+char mPoint[] = "000";
+
+void setup() {
+  
+  UBRR0H = 0;
+  UBRR0L = 105;
+  UCSR0B = (1 << RXEN0) | (1 << TXEN0);
+  UCSR0C = (1 << USBS0) | (3 << UCSZ00);
+
+  TCNT1 = TCCR1A = TCCR1B = 0;
+  TCCR1B = 1 << WGM12;
+  TCCR1B |= (1 << CS10);
+  OCR1A = 100;
+  TIMSK1 |= 1 << OCIE1A;
+  sei();
+
+}
+
+void loop() {
+/*
+  if(Serial.available() > 0 )
+  {
+    
+    i = 0; 
+       Serial.println("aaa");
+  }
+*/
+  while (j < i)
+  {
+       
+   Serial.println(fs[j]);
+    UDR0 = 10;
+    UDR0 = 0;
+      j++;
+    
+  }
+if(j >= LEN && i >= LEN)
+{
+  i = 0;
+  j = 0; 
+}
+}
+
+ISR(TIMER1_COMPA_vect)
+{
+  if (i < LEN)
+  {
+    i++;
+
+   fs[i] = analogRead(0) >> 2;
+ /*  Serial.println(fs[i]);
+UDR0 = 10;
+UDR0 = 0;
+*/ 
+//if (i >= LEN && j >= LEN) j = 0;
+  }
+  
+   
+}
